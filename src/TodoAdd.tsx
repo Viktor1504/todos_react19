@@ -1,13 +1,17 @@
 import {ChangeEvent, FormEvent, useState} from "react";
 import {TodoListType} from "./Todos.tsx";
+import {useNavigate} from "react-router";
+import {Path} from "./router.tsx";
 
 export const TodoAdd = ({add}: { add: (deed: TodoListType) => void }) => {
     const [title, setTitle] = useState('')
     const [desc, setDesc] = useState('');
     const [image, setImage] = useState('');
 
+    const navigate = useNavigate()
+
     const handleImageChange = (evt: ChangeEvent<HTMLInputElement>) => {
-        const cFiles = evt.target.files;
+        const cFiles = evt.currentTarget.files;
         if (cFiles && cFiles.length > 0) {
             const fileReader = new FileReader();
             if (fileReader.result !== null) {
@@ -16,7 +20,6 @@ export const TodoAdd = ({add}: { add: (deed: TodoListType) => void }) => {
             fileReader.readAsDataURL(cFiles[0])
         } else {
             setImage('')
-
         }
     }
 
@@ -27,7 +30,8 @@ export const TodoAdd = ({add}: { add: (deed: TodoListType) => void }) => {
         newDeed.createdAt = date.toLocaleString();
         newDeed.key = date.getTime()
         add(newDeed);
-        (evt.target as HTMLFormElement)?.reset();
+        (evt.currentTarget as HTMLFormElement)?.reset()
+        navigate(Path.Main)
     }
 
     const handleFormReset = () => {
@@ -69,7 +73,7 @@ export const TodoAdd = ({add}: { add: (deed: TodoListType) => void }) => {
                         <input type="reset" className="button is-warning is-light" value="Cбpoc"/>
                     </div>
                     <div className="control">
-                        <input type="submit" className="button is-primary" value={'Создать тело'}/>
+                        <input type="submit" className="button is-primary" value={'Создать дело'}/>
                     </div>
 
                 </div>
