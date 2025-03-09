@@ -1,14 +1,13 @@
 import {ChangeEvent, FormEvent, useState} from "react";
-import {TodoListType} from "./Todos.tsx";
-import {useNavigate} from "react-router";
-import {Path} from "./router.tsx";
+import {useSubmit} from "react-router";
 
-export const TodoAdd = ({add}: { add: (deed: TodoListType) => void }) => {
+export const TodoAdd = () => {
+    const submit = useSubmit()
+
     const [title, setTitle] = useState('')
     const [desc, setDesc] = useState('');
     const [image, setImage] = useState('');
 
-    const navigate = useNavigate()
 
     const handleImageChange = (evt: ChangeEvent<HTMLInputElement>) => {
         const cFiles = evt.currentTarget.files;
@@ -25,13 +24,7 @@ export const TodoAdd = ({add}: { add: (deed: TodoListType) => void }) => {
 
     const handleFormSubmit = (evt: FormEvent<HTMLFormElement>) => {
         evt.preventDefault()
-        const newDeed: TodoListType = {title, desc, image, done: false, createdAt: '', key: 0}
-        const date = new Date();
-        newDeed.createdAt = date.toLocaleString();
-        newDeed.key = date.getTime()
-        add(newDeed);
-        (evt.currentTarget as HTMLFormElement)?.reset()
-        navigate(Path.Main)
+        submit({title, desc, image}, {action: '/add', method: 'post'})
     }
 
     const handleFormReset = () => {

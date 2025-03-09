@@ -1,13 +1,11 @@
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import 'bulma/css/bulma.css'
-import {App} from './App.tsx'
-import {BrowserRouter} from "react-router";
+import {RouterProvider} from "react-router/dom";
+import {router} from "./router.tsx";
 
 createRoot(document.getElementById('root')!).render(
-    <BrowserRouter>
-        <StrictMode>
-            <App/>
-        </StrictMode>
-    </BrowserRouter>
+    <StrictMode>
+        <RouterProvider router={router}/>
+    </StrictMode>
 )

@@ -28,9 +28,3 @@ export const todos: TodoListType[] = [
         key: date2.getTime()
     }
 ]
-
-export const Todos = () => {
-    return (
-        <></>
-    );
-};

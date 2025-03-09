@@ -1,24 +1,16 @@
-import {Route, Routes} from "react-router";
+import {createBrowserRouter, createRoutesFromElements, Route} from "react-router";
 import {TodoAdd} from "./TodoAdd.tsx";
 import {TodoList} from "./TodoList.tsx";
-import {TodoListType} from "./Todos.tsx";
+import {App} from "./App.tsx";
+import {addTodo, getTodo, getTodos} from "./api.ts";
+import {TodoDetail} from "./TodoDetail.tsx";
 
-export const Path = {
-    Main: "/",
-    Add: "/add",
-} as const;
-
-type RoutingProps = {
-    setDone: (key: number) => void;
-    del: (key: number) => void;
-    add: (deed: TodoListType) => void;
-};
-
-export const Routing = ({setDone, del, add}: RoutingProps) => {
-    return (
-        <Routes>
-            <Route path={Path.Main} element={<TodoList  setDone={setDone} del={del}/>}/>
-            <Route path={Path.Add} element={<TodoAdd add={add}/>}/>
-        </Routes>
-    );
-};
+export const router = createBrowserRouter(
+    createRoutesFromElements(
+        <Route path={'/'} element={<App/>}>
+            <Route index={true} element={<TodoList/>} loader={getTodos}/>
+            <Route path={'/add'} element={<TodoAdd/>} action={addTodo}/>
+            <Route path=':key' element={<TodoDetail/>} loader={getTodo}/>
+        </Route>
+    )
+)

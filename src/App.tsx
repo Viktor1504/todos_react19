@@ -1,6 +1,5 @@
 import {MouseEvent, useState} from "react";
-import {Path, Routing} from "./router.tsx";
-import {NavLink} from "react-router";
+import {NavLink, Outlet} from "react-router";
 
 export const App = () => {
     const [showMenu, setShowMenu] = useState(false);
@@ -15,7 +14,7 @@ export const App = () => {
             <nav className="navbar is-light">
                 <div className="navbar-brand">
                     <NavLink
-                        to={Path.Main}
+                        to={'/'}
                         className={({isActive}) => 'navbar-item is-uppercase' +
                             (isActive ? 'is-active' : '')}
                     >
@@ -46,7 +45,7 @@ export const App = () => {
                 </div>
             </nav>
             <main className="content px-6 py-6">
-                <Routing todos={todos} setDone={setDone} del={del} add={add}/>
+                <Outlet/>
             </main>
         </div>
     );

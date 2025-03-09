@@ -1,8 +1,7 @@
-import {redirect} from "react-router";
-import {todos} from "./Todos.tsx";
-import {Path} from "./router.tsx";
+import {LoaderFunctionArgs, redirect} from "react-router";
+import {TodoListType, todos} from "./todos.ts";
 
-export const getTodos = () => {
+export const getTodos = (): TodoListType[] => {
     return todos
 }
 
@@ -18,5 +17,13 @@ export const addTodo = async ({request}: { request: Request }) => {
         key: date.getTime()
     }
     todos.push(newTodo)
-    return redirect(Path.Main)
+    return redirect('/')
 }
+
+export const getTodo = ({params}: LoaderFunctionArgs): TodoListType | undefined => {
+    if (!params || !params.key) {
+        return undefined
+    }
+    const key = +params.key;
+    return todos.find((item) => item.key === key);
+};

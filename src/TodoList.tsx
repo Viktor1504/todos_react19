@@ -1,13 +1,8 @@
-import {TodoListType} from "./Todos.tsx";
+import {Link, useLoaderData} from "react-router";
+import {TodoListType} from "./todos.ts";
 
-export const TodoList = ({list, setDone, del}: {
-                             list: TodoListType[],
-                             setDone: (key: number) => void,
-                             del: (key: number
-                             ) => void
-                         }
-    ) => {
-
+export const TodoList = () => {
+        const list = useLoaderData<TodoListType[]>()
 
         return (
             <section>
@@ -17,17 +12,18 @@ export const TodoList = ({list, setDone, del}: {
                     {list.map((item) => (
                         <tr key={item.key}>
                             <td>
-                                {item.done ? <del>{item.title}</del> : item.title}
+                                <Link to={`/${item.key}`}>
+                                    {item.done && <del>{item.title}</del>}
+                                    {!item.done && item.title}
+                                </Link>
                             </td>
                             <td>
-                                <button className="button is-success" title="Выполнено" disabled={item.done}
-                                        onClick={() => setDone(item.key)}>
+                                <button className="button is-success" title="Выполнено" disabled={item.done}>
                                     &#x2713;
                                 </button>
                             </td>
                             <td>
-                                <button className="button is-danger" title="Удалить"
-                                        onClick={() => del(item.key)}>&#9746;</button>
+                                <button className="button is-danger" title="Удалить">&#9746;</button>
                             </td>
                         </tr>
                     ))}
