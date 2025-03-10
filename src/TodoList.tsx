@@ -1,8 +1,17 @@
-import {Link, useLoaderData} from "react-router";
+import {Link, useLoaderData, useSubmit} from "react-router";
 import {TodoListType} from "./todos.ts";
 
 export const TodoList = () => {
         const list = useLoaderData<TodoListType[]>()
+        const submit = useSubmit()
+
+        const handleDone = (key: number) => {
+            submit(null, {action: `/${key}`, method: 'patch'})
+        }
+
+        const handleDelete = (key: number) => {
+            submit(null, {action: `/${key}`, method: 'delete'})
+        }
 
         return (
             <section>
@@ -18,12 +27,23 @@ export const TodoList = () => {
                                 </Link>
                             </td>
                             <td>
-                                <button className="button is-success" title="Выполнено" disabled={item.done}>
+                                <button
+                                    className="button is-success"
+                                    title="Выполнено"
+                                    disabled={item.done}
+                                    onClick={() => handleDone(item.key)}
+                                >
                                     &#x2713;
                                 </button>
                             </td>
                             <td>
-                                <button className="button is-danger" title="Удалить">&#9746;</button>
+                                <button
+                                    className="button is-danger"
+                                    title="Удалить"
+                                    onClick={() => handleDelete(item.key)}
+                                >
+                                    &#9746;
+                                </button>
                             </td>
                         </tr>
                     ))}
