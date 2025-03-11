@@ -12,7 +12,7 @@ export const TodoDetail = () => {
                 </p>
             }
             <h1>{todo.title}</h1>
-            <p>{todo.createdAt}</p>
+            <p>{todo.createdAt} </p>
             {todo.desc && <p>{todo.desc}</p>}
             {todo.image && <p><img src={todo.image} alt={'Иллюстрация'}/></p>}
         </section>
