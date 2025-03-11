@@ -1,5 +1,8 @@
 import {LoaderFunctionArgs, redirect} from "react-router";
 import {TodoListType, todos} from "./todos.ts";
+import {getAuth, createUserWithEmailAndPassword, AuthError} from 'firebase/auth';
+import firebaseApp from "./firebase.ts";
+
 
 export const getTodos = (): TodoListType[] => {
     return todos
@@ -49,3 +52,19 @@ export const actTodo = (args: LoaderFunctionArgs) => {
     }
     return redirect('/')
 }
+
+const auth = getAuth(firebaseApp)
+
+export const register = async ({request}: { request: LoaderFunctionArgs['request'] }) => {
+    const fd = await request.formData();
+    const email = String(fd.get('email'))
+    const password = String(fd.get('password'))
+
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        return redirect('/');
+    } catch (err) {
+        const error = err as AuthError
+        return error.code
+    }
+};
