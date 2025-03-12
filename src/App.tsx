@@ -1,8 +1,19 @@
-import {MouseEvent, useState} from "react";
+import {MouseEvent, useEffect, useState} from "react";
 import {NavLink, Outlet} from "react-router";
+import {setStateChangeHandler} from "./api.ts";
+import {User} from "firebase/auth";
 
 export const App = () => {
     const [showMenu, setShowMenu] = useState(false);
+
+    const [user, setUser] = useState<User | null>(null);
+    const authStateChanged = (user: User | null) => {
+        setUser(user);
+    };
+    useEffect(() => {
+        const unsubscribe = setStateChangeHandler(authStateChanged)
+        return () => unsubscribe()
+    }, [])
 
     const handleBurgerClick = (evt: MouseEvent<HTMLElement>) => {
         evt.preventDefault();
@@ -18,7 +29,7 @@ export const App = () => {
                         className={({isActive}) => 'navbar-item is-uppercase' +
                             (isActive ? 'is-active' : '')}
                     >
-                        Todos
+                        {user ? user.email : 'Todos'}
                     </NavLink>
                     <a
                         href="/"
@@ -35,12 +46,18 @@ export const App = () => {
                      onClick={handleBurgerClick}
                 >
                     <div className="navbar-start">
-                        <NavLink
+                        {user && <NavLink
                             to="/add"
-                            className={({isActive}) => 'navbar-item' + (isActive ? 'is-active' : '')}
+                            className={({isActive}) => 'navbar-item' + (isActive ? ' is-active' : '')}
                         >
                             Создать дело
                         </NavLink>
+                        }
+                        {!user && <NavLink to={'/register'}
+                                           className={({isActive}) => 'navbar-item' + (isActive ? ' is-active' : '')}>
+                            Зарегистрироваться
+                        </NavLink>
+                        }
                     </div>
                 </div>
             </nav>

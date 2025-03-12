@@ -22,9 +22,9 @@ export const TodoAdd = () => {
         }
     }
 
-    const handleFormSubmit = (evt: FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = async (evt: FormEvent<HTMLFormElement>) => {
         evt.preventDefault()
-        submit({title, desc, image}, {action: '/add', method: 'post'})
+        await submit({title, desc, image}, {action: '/add', method: 'post'})
     }
 
     const handleFormReset = () => {
@@ -71,7 +71,6 @@ export const TodoAdd = () => {
 
                 </div>
             </form>
-
         </section>
     );
 };

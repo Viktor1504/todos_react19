@@ -1,6 +1,6 @@
 import {LoaderFunctionArgs, redirect} from "react-router";
 import {TodoListType, todos} from "./todos.ts";
-import {getAuth, createUserWithEmailAndPassword, AuthError} from 'firebase/auth';
+import {getAuth, createUserWithEmailAndPassword, AuthError, onAuthStateChanged, User} from 'firebase/auth';
 import firebaseApp from "./firebase.ts";
 
 
@@ -38,20 +38,22 @@ export const getTodo = ({params}: { params: LoaderFunctionArgs['params'] }): Tod
 export const actTodo = (args: LoaderFunctionArgs) => {
     const key = args.params.key;
     if (!key) {
-        return undefined
+        return undefined;
     }
-    const index = todos.findIndex((item) => item.key === +key)
+    const index = todos.findIndex((item) => item.key === +key);
 
     if (index === -1) {
-        return undefined
+        return undefined;
     }
+
     if (args.request.method === 'PATCH') {
-        todos[index].done = true
-    } else {
-        todos.splice(index, 1)
+        todos[index].done = true;
+    } else if (args.request.method === 'DELETE') {
+        todos.splice(index, 1);
     }
-    return redirect('/')
-}
+
+    return redirect('/');
+};
 
 const auth = getAuth(firebaseApp)
 
@@ -68,3 +70,7 @@ export const register = async ({request}: { request: LoaderFunctionArgs['request
         return error.code
     }
 };
+
+export const setStateChangeHandler = (func: (user: User | null) => void) => {
+    return onAuthStateChanged(auth, func)
+}
