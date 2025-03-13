@@ -1,16 +1,16 @@
 import {Link, useLoaderData, useSubmit} from "react-router";
-import {TodoListType} from "./todos.ts";
+import {TodoListType} from "./api.ts";
 
 export const TodoList = () => {
         const list = useLoaderData<TodoListType[]>()
         const submit = useSubmit()
 
-        const handleDone = (key: number) => {
-            submit(null, {action: `/${key}`, method: 'patch'})
+        const handleDone = async (key: string) => {
+            await submit(null, {action: `/${key}`, method: 'patch'})
         }
 
-        const handleDelete = (key: number) => {
-            submit(null, {action: `/${key}`, method: 'delete'})
+        const handleDelete = async (key: string) => {
+            await submit(null, {action: `/${key}`, method: 'delete'})
         }
 
         return (

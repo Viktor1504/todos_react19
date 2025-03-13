@@ -1,69 +1,81 @@
 import {LoaderFunctionArgs, redirect} from "react-router";
-import {TodoListType, todos} from "./todos.ts";
 import {
     AuthError,
     createUserWithEmailAndPassword,
     getAuth,
     onAuthStateChanged,
     signInWithEmailAndPassword,
-    User,
-    signOut
+    signOut,
+    User
 } from 'firebase/auth';
+import {getDatabase, push, ref, set, query, get, remove} from "firebase/database";
 import firebaseApp from "./firebase.ts";
 
+export type TodoListType = {
+    key: string
+    title: string,
+    desc: string,
+    image: string,
+    done: boolean,
+    createdAt: string,
+}
 
-export const getTodos = (): TodoListType[] => {
-    return todos
+type NewTodo = Omit<TodoListType, 'key'>;
+
+const auth = getAuth(firebaseApp)
+const database = getDatabase(firebaseApp)
+
+export const getTodos = async (): Promise<TodoListType[]> => {
+    const currentUserId = getUserId()
+    const r = ref(database, `users/${currentUserId}/todos`)
+    const q = query(r)
+    const s = await get(q)
+    const res: TodoListType[] = []
+    s.forEach(doc => {
+        const todo = doc.val() as TodoListType
+        todo.key = doc.key
+        res.push(todo)
+    })
+    return res
 }
 
 export const addTodo = async ({request}: { request: LoaderFunctionArgs['request'] }) => {
+    const currentUserId = getUserId()
     const fd = await request.formData()
     const date = new Date();
-    const newTodo = {
+    const newTodo: NewTodo = {
         title: String(fd.get('title')),
         desc: String(fd.get('desc')),
         image: String(fd.get('image')),
         done: false,
         createdAt: date.toLocaleString(),
-        key: date.getTime()
     }
-    todos.push(newTodo)
+    const db = ref(database, `users/${currentUserId}/todos`)
+    const r = await push(db)
+    await set(r, newTodo)
     return redirect('/')
 }
 
-export const getTodo = ({params}: { params: LoaderFunctionArgs['params'] }): TodoListType | undefined => {
-    const key = params.key;
-    if (!key) {
-        return undefined;
-    }
-    const todo = todos.find((item) => item.key === +key)
-    if (!todo) {
-        throw new Error
-    }
-    return todo
+export const getTodo = async ({params}: { params: LoaderFunctionArgs['params'] }): Promise<TodoListType> => {
+    const currentUserId = getUserId()
+    const r = ref(database, `users/${currentUserId}/todos/${params.key}`)
+    const q = query(r)
+    const s = await get(q)
+    if (!s.exists()) throw new Error()
+    return s.val()
 };
 
-export const actTodo = (args: LoaderFunctionArgs) => {
-    const key = args.params.key;
-    if (!key) {
-        return undefined;
-    }
-    const index = todos.findIndex((item) => item.key === +key);
-
-    if (index === -1) {
-        return undefined;
-    }
-
+export const actTodo = async (args: LoaderFunctionArgs) => {
+    const currentUserId = getUserId()
     if (args.request.method === 'PATCH') {
-        todos[index].done = true;
+        const r = ref(database, `users/${currentUserId}/todos/${args.params.key}/done`)
+        await set(r, true)
     } else if (args.request.method === 'DELETE') {
-        todos.splice(index, 1);
+        const r = ref(database, `users/${currentUserId}/todos/${args.params.key}`)
+        await remove(r)
     }
-
     return redirect('/');
 };
-
-const auth = getAuth(firebaseApp)
 
 export const register = async ({request}: { request: LoaderFunctionArgs['request'] }) => {
     const fd = await request.formData();
@@ -97,4 +109,8 @@ export const login = async ({request}: { request: LoaderFunctionArgs['request'] 
 export const logout = async () => {
     await signOut(auth)
     return redirect('/login')
+}
+
+export const getUserId = () => {
+    return auth.currentUser?.uid
 }

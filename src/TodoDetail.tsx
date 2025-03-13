@@ -1,5 +1,5 @@
 import {useLoaderData} from "react-router";
-import {TodoListType} from "./todos.ts";
+import {TodoListType} from "./api.ts";
 
 export const TodoDetail = () => {
 
