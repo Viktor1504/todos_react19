@@ -1,6 +1,14 @@
 import {LoaderFunctionArgs, redirect} from "react-router";
 import {TodoListType, todos} from "./todos.ts";
-import {getAuth, createUserWithEmailAndPassword, AuthError, onAuthStateChanged, User} from 'firebase/auth';
+import {
+    AuthError,
+    createUserWithEmailAndPassword,
+    getAuth,
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    User,
+    signOut
+} from 'firebase/auth';
 import firebaseApp from "./firebase.ts";
 
 
@@ -73,4 +81,20 @@ export const register = async ({request}: { request: LoaderFunctionArgs['request
 
 export const setStateChangeHandler = (func: (user: User | null) => void) => {
     return onAuthStateChanged(auth, func)
+}
+
+export const login = async ({request}: { request: LoaderFunctionArgs['request'] }) => {
+    const fd = await request.formData()
+    try {
+        await signInWithEmailAndPassword(auth, String(fd.get('email')), String(fd.get('password')))
+        return redirect('/')
+    } catch (err) {
+        const error = err as AuthError
+        return error.code
+    }
+}
+
+export const logout = async () => {
+    await signOut(auth)
+    return redirect('/login')
 }

@@ -46,18 +46,32 @@ export const App = () => {
                      onClick={handleBurgerClick}
                 >
                     <div className="navbar-start">
-                        {user && <NavLink
-                            to="/add"
-                            className={({isActive}) => 'navbar-item' + (isActive ? ' is-active' : '')}
-                        >
-                            Создать дело
-                        </NavLink>
-                        }
-                        {!user && <NavLink to={'/register'}
-                                           className={({isActive}) => 'navbar-item' + (isActive ? ' is-active' : '')}>
-                            Зарегистрироваться
-                        </NavLink>
-                        }
+                        {user && (<NavLink
+                                to="/add"
+                                className={({isActive}) => 'navbar-item' + (isActive ? ' is-active' : '')}>
+                                Создать дело
+                            </NavLink>
+                        )}
+                        {!user && (
+                            <NavLink to="/login"
+                                     className={({isActive}) =>
+                                         'navbar-item' + (isActive ? ' is-active' : '')}>
+                                Войти
+                            </NavLink>
+
+                        )}
+                        {!user && (<NavLink to={'/register'}
+                                            className={({isActive}) => 'navbar-item' + (isActive ? ' is-active' : '')}>
+                                Зарегистрироваться
+                            </NavLink>
+                        )}
+                        {user && (
+                            <div className="navbar-end">
+                                <NavLink to="/logout" className="navbar-item">
+                                    Выйти
+                                </NavLink>
+                            </div>
+                        )}
                     </div>
                 </div>
             </nav>
