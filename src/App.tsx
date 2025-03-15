@@ -3,10 +3,14 @@ import {NavLink, Outlet} from "react-router";
 import {setStateChangeHandler} from "./api.ts";
 import {User} from "firebase/auth";
 
+export function HydrateFallback() {
+    return <p>Loading Todos...</p>;
+}
+
 export const App = () => {
     const [showMenu, setShowMenu] = useState(false);
-
     const [user, setUser] = useState<User | null>(null);
+
     const authStateChanged = (user: User | null) => {
         setUser(user);
     };

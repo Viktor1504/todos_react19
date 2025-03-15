@@ -22,11 +22,30 @@ export type TodoListType = {
 
 type NewTodo = Omit<TodoListType, 'key'>;
 
-const auth = getAuth(firebaseApp)
+export const auth = getAuth(firebaseApp)
 const database = getDatabase(firebaseApp)
+
+export const getUserId = () => {
+    if (auth.currentUser) {
+        return auth.currentUser.uid;
+    } else {
+        const userId = localStorage.getItem('user-id');
+        if (!userId) {
+            throw redirect('/login'); // Перенаправление, если пользователь не авторизован
+        }
+        return userId;
+    }
+}
+
+export const setStateChangeHandler = (func: (user: User | null) => void) => {
+    return onAuthStateChanged(auth, func)
+}
 
 export const getTodos = async (): Promise<TodoListType[]> => {
     const currentUserId = getUserId()
+    if (!currentUserId) {
+        throw redirect('/login')
+    }
     const r = ref(database, `users/${currentUserId}/todos`)
     const q = query(r)
     const s = await get(q)
@@ -83,7 +102,8 @@ export const register = async ({request}: { request: LoaderFunctionArgs['request
     const password = String(fd.get('password'))
 
     try {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const cr = await createUserWithEmailAndPassword(auth, email, password);
+        localStorage.setItem('user-id', cr.user.uid)
         return redirect('/');
     } catch (err) {
         const error = err as AuthError
@@ -91,14 +111,11 @@ export const register = async ({request}: { request: LoaderFunctionArgs['request
     }
 };
 
-export const setStateChangeHandler = (func: (user: User | null) => void) => {
-    return onAuthStateChanged(auth, func)
-}
-
 export const login = async ({request}: { request: LoaderFunctionArgs['request'] }) => {
     const fd = await request.formData()
     try {
-        await signInWithEmailAndPassword(auth, String(fd.get('email')), String(fd.get('password')))
+        const cr = await signInWithEmailAndPassword(auth, String(fd.get('email')), String(fd.get('password')))
+        localStorage.setItem('user-id', cr.user.uid)
         return redirect('/')
     } catch (err) {
         const error = err as AuthError
@@ -108,9 +125,6 @@ export const login = async ({request}: { request: LoaderFunctionArgs['request'] 
 
 export const logout = async () => {
     await signOut(auth)
+    localStorage.removeItem('user-id')
     return redirect('/login')
-}
-
-export const getUserId = () => {
-    return auth.currentUser?.uid
 }
