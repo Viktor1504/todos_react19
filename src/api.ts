@@ -29,11 +29,7 @@ export const getUserId = () => {
     if (auth.currentUser) {
         return auth.currentUser.uid;
     } else {
-        const userId = localStorage.getItem('user-id');
-        if (!userId) {
-            throw redirect('/login'); // Перенаправление, если пользователь не авторизован
-        }
-        return userId;
+        return localStorage.getItem('user-id')
     }
 }
 
@@ -58,8 +54,23 @@ export const getTodos = async (): Promise<TodoListType[]> => {
     return res
 }
 
+export const getTodo = async ({params}: { params: LoaderFunctionArgs['params'] }): Promise<TodoListType> => {
+    const currentUserId = getUserId()
+    if (!currentUserId) {
+        throw redirect('/login')
+    }
+    const r = ref(database, `users/${currentUserId}/todos/${params.key}`)
+    const q = query(r)
+    const s = await get(q)
+    if (!s.exists()) throw new Error()
+    return s.val()
+};
+
 export const addTodo = async ({request}: { request: LoaderFunctionArgs['request'] }) => {
     const currentUserId = getUserId()
+    if (!currentUserId) {
+        throw redirect('/login')
+    }
     const fd = await request.formData()
     const date = new Date();
     const newTodo: NewTodo = {
@@ -75,17 +86,11 @@ export const addTodo = async ({request}: { request: LoaderFunctionArgs['request'
     return redirect('/')
 }
 
-export const getTodo = async ({params}: { params: LoaderFunctionArgs['params'] }): Promise<TodoListType> => {
-    const currentUserId = getUserId()
-    const r = ref(database, `users/${currentUserId}/todos/${params.key}`)
-    const q = query(r)
-    const s = await get(q)
-    if (!s.exists()) throw new Error()
-    return s.val()
-};
-
 export const actTodo = async (args: LoaderFunctionArgs) => {
     const currentUserId = getUserId()
+    if (!currentUserId) {
+        throw redirect('/login')
+    }
     if (args.request.method === 'PATCH') {
         const r = ref(database, `users/${currentUserId}/todos/${args.params.key}/done`)
         await set(r, true)
@@ -127,4 +132,18 @@ export const logout = async () => {
     await signOut(auth)
     localStorage.removeItem('user-id')
     return redirect('/login')
+}
+
+export const onlyLoggedOut = () => {
+    if (getUserId())
+        return redirect('/');
+    else
+        return null;
+}
+
+export const requireAuth = () => {
+    if (!getUserId()) {
+        throw redirect('/login');
+    }
+    return null; // Ничего не возвращаем, если авторизация прошла
 }

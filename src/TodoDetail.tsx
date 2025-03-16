@@ -2,7 +2,6 @@ import {useLoaderData} from "react-router";
 import {TodoListType} from "./api.ts";
 
 export const TodoDetail = () => {
-
     const todo = useLoaderData<TodoListType>()
     return (
         <section>
@@ -16,6 +15,5 @@ export const TodoDetail = () => {
             {todo.desc && <p>{todo.desc}</p>}
             {todo.image && <p><img src={todo.image} alt={'Иллюстрация'}/></p>}
         </section>
-    );
-};
-
+    )
+}

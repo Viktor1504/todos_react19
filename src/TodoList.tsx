@@ -6,11 +6,11 @@ export const TodoList = () => {
         const submit = useSubmit()
 
         const handleDone = async (key: string) => {
-            await submit(null, {action: `/${key}`, method: 'patch'})
+            await submit(null, {action: `/${key}`, method: 'PATCH'})
         }
 
         const handleDelete = async (key: string) => {
-            await submit(null, {action: `/${key}`, method: 'delete'})
+            await submit(null, {action: `/${key}`, method: 'DELETE'})
         }
 
         return (

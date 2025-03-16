@@ -2,7 +2,7 @@ import {ChangeEvent, FormEvent, useState} from "react";
 import {useSubmit} from "react-router";
 
 export const TodoAdd = () => {
-    const submit = useSubmit()
+    const submit = useSubmit();
 
     const [title, setTitle] = useState('')
     const [desc, setDesc] = useState('');
@@ -24,7 +24,7 @@ export const TodoAdd = () => {
 
     const handleFormSubmit = async (evt: FormEvent<HTMLFormElement>) => {
         evt.preventDefault()
-        await submit({title, desc, image}, {action: '/add', method: 'post'})
+        await submit({title, desc, image}, {action: '/add', method: 'POST'})
     }
 
     const handleFormReset = () => {
@@ -40,7 +40,8 @@ export const TodoAdd = () => {
                 <div className="field">
                     <label className="label">Заголовок</label>
                     <div className="control">
-                        <input className="input" value={title} onChange={e => setTitle(e.currentTarget.value)}/>
+                        <input className="input" value={title} onChange={e => setTitle(e.currentTarget.value)}
+                        />
                     </div>
                 </div>
                 <div className="field">
